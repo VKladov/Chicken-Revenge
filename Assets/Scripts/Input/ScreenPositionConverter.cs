@@ -6,7 +6,7 @@ namespace Scripts.Input
 {
     public class ScreenPositionConverter
     {
-        private Camera _camera;
+        private readonly Camera _camera;
         
         public ScreenPositionConverter(Camera camera)
         {

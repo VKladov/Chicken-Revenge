@@ -1,15 +1,17 @@
 using System;
 using Scripts.Input;
 using UnityEngine;
+using Zenject;
 
-public class MouseInput : MonoBehaviour, IPlayerInput
+public class MouseInput : ITickable, IPlayerInput
 {
     public event Action ShootPressed;
     public event Action ShootReleased;
     public event Action<Vector2> ScreenPositionChanged;
     public event Action ToggleAlingMode;
+    public event Action SwitchWeapon;
 
-    private void Update()
+    public void Tick()
     {
         if (Input.GetMouseButtonDown(0))
         {
@@ -24,6 +26,11 @@ public class MouseInput : MonoBehaviour, IPlayerInput
         if (Input.GetKeyDown(KeyCode.E))
         {
             ToggleAlingMode?.Invoke();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            SwitchWeapon?.Invoke();
         }
         
         ScreenPositionChanged?.Invoke(Input.mousePosition);

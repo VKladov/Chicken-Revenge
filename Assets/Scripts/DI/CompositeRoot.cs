@@ -1,40 +1,62 @@
 using Scripts.Input;
 using Scripts.Weapon;
-using Scripts.Weapon.AutoGun;
 using UnityEngine;
+using UnityEngine.Serialization;
+using Zenject;
 
 namespace Scripts.DI
 {
-    public class CompositeRoot : MonoBehaviour
+    public class CompositeRoot : MonoInstaller
     {
         [SerializeField] private Rect _playerArea;
         [SerializeField] private Player _player;
-        [SerializeField] private MouseInput _mouseInput;
         [SerializeField] private Camera _mainCamera;
-        [SerializeField] private UpdateProvider _updateProvider;
         
+        [FormerlySerializedAs("_baseGunView")]
         [Header("Base Gun Settings")]
-        [SerializeField] private BaseGunView _baseGunView;
+        [SerializeField] private GunView _gunView;
         [SerializeField] private Bullet _baseGunBullet;
         [SerializeField] private float _baseGunShotDelay;
         
         [Header("Auto Gun Settings")]
-        [SerializeField] private BaseGunView _autoGunView;
+        [SerializeField] private GunView _autoGunView;
         [SerializeField] private Bullet _autoGunBullet;
         [SerializeField] private float _autoGunShotDelay;
-        
-        private void Start()
+
+        public override void InstallBindings()
         {
-            var positionConverter = new ScreenPositionConverter(_mainCamera);
-            var limits = new PlayerAreaLimiter(_playerArea);
-            var movement = new PlayerMovement(_mouseInput, _player, positionConverter, limits);
-            var bulletAligner = new BulletAligner(_player, _updateProvider);
-            var bulletSpawner = new BulletSpawner(bulletAligner);
+            Container.Bind<Camera>().FromInstance(_mainCamera);
+            Container.Bind<Player>().FromInstance(_player);
+            Container.BindInterfacesAndSelfTo<MouseInput>().AsSingle();
+            Container.Bind<ScreenPositionConverter>().AsSingle();
+            Container.Bind<Rect>().FromInstance(_playerArea);
+            Container.Bind<PlayerAreaLimiter>().AsSingle();
+            Container.BindInterfacesAndSelfTo<BulletAligner>().AsSingle();
+            Container.Bind<BulletSpawner>().AsSingle();
             
-            var baseGun = new BaseGun(_baseGunView, _baseGunBullet, bulletSpawner, _baseGunShotDelay);
-            var autoGun = new AutoGun(_autoGunView, _autoGunBullet, bulletSpawner, _autoGunShotDelay);
-            var shooter = new PlayerShooter(_mouseInput, _player, autoGun);
-            var alingMode = new AlingMode(bulletAligner, _mouseInput);
+            Container.Bind<PlayerMovement>().AsSingle().NonLazy();
+            Container.Bind<PlayerShooter>().AsSingle().NonLazy();
+            Container.Bind<AlingMode>().AsSingle().NonLazy();
+            Container.Bind<WeaponSwitch>().AsSingle().NonLazy();
+
+            Container.Bind<Gun>().WithId("Rifle").FromSubContainerResolve().ByMethod(InstallBaseGun).AsCached();
+            Container.Bind<Gun>().WithId("Auto").FromSubContainerResolve().ByMethod(InstallAutoGun).AsCached();
+        }
+
+        private void InstallBaseGun(DiContainer subContainer)
+        {
+            subContainer.Bind<Gun>().AsSingle();
+            subContainer.Bind<GunView>().FromInstance(_gunView);
+            subContainer.Bind<Bullet>().FromInstance(_baseGunBullet);
+            subContainer.BindInstance(_baseGunShotDelay);
+        }
+
+        private void InstallAutoGun(DiContainer subContainer)
+        {
+            subContainer.Bind<Gun>().AsSingle();
+            subContainer.Bind<GunView>().FromInstance(_autoGunView);
+            subContainer.Bind<Bullet>().FromInstance(_autoGunBullet);
+            subContainer.BindInstance(_autoGunShotDelay);
         }
 
         private void OnDrawGizmos()

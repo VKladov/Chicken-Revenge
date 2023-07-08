@@ -9,5 +9,6 @@ namespace Scripts.Input
         public event Action ShootReleased;
         public event Action<Vector2> ScreenPositionChanged;
         public event Action ToggleAlingMode;
+        public event Action SwitchWeapon;
     }
 }

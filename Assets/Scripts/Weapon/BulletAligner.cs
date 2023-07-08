@@ -1,40 +1,28 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 namespace Scripts.Weapon
 {
-    public class BulletAligner
+    public class BulletAligner : ITickable
     {
         private readonly List<Bullet> _bulletsToControl = new();
         private readonly Player _player;
-        private readonly IUpdateProvider _updateProvider;
         private bool _enabled;
 
-        public BulletAligner(Player player, IUpdateProvider updateProvider)
+        public BulletAligner(Player player)
         {
             _player = player;
-            _updateProvider = updateProvider;
-            Enable();
         }
 
         public void Enable()
         {
-            if (_enabled)
-            {
-                return;
-            }
-            _updateProvider.OnUpdate += OnUpdate;
             _enabled = true;
         }
 
         public void Disable()
         {
-            if (!_enabled)
-            {
-                return;
-            }
-            _updateProvider.OnUpdate -= OnUpdate;
             _enabled = false;
         }
 
@@ -50,8 +38,12 @@ namespace Scripts.Weapon
             _bulletsToControl.Remove(bullet);
         }
 
-        private void OnUpdate(float deltaTime)
+        public void Tick()
         {
+            if (!_enabled)
+            {
+                return;
+            }
             _bulletsToControl.ForEach(bullet =>
             {
                 var playerPosition = _player.transform.position;

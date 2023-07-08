@@ -4,5 +4,7 @@ namespace Scripts.Weapon
     {
         public void PressTrigger();
         public void ReleaseTrigger();
+        public void Show();
+        public void Hide();
     }
 }
