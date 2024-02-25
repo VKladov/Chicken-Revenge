@@ -1,47 +1,35 @@
-using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace Scripts.Weapon
+namespace Scripts
 {
     public class Bullet : MonoBehaviour
     {
-        public event Action<Bullet> Destroyed;
-
         [SerializeField] private float _moveSpeed;
 
-        private Vector3 _lastPosition;
         private Transform _transform;
+        private readonly RaycastHit[] _hits = new RaycastHit[10];
 
-        private void Start()
+        public async UniTask Fly(CancellationToken cancellationToken)
         {
             _transform = transform;
-            _lastPosition = _transform.position;
-        }
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var prevPosition = transform.position;
+            
+                var distance = _moveSpeed * Time.deltaTime;
+                var direction = _transform.forward;
+                _transform.position += direction * distance;
 
-        private void Update()
-        {
-            _lastPosition = transform.position;
-            var position = _transform.position;
-            position += _transform.forward * _moveSpeed * Time.deltaTime;
-            _transform.position = position;
-            Raycast(_lastPosition, position);
-        }
-
-        private void Raycast(Vector3 from, Vector3 to)
-        {
-            var hits = Physics.RaycastAll(from, (to - from).normalized, Vector3.Distance(from, to));
-            foreach (var raycastHit in hits)
-            { 
-                if (raycastHit.transform.TryGetComponent(out GameFieldsWall wall))
+                var size = Physics.RaycastNonAlloc(prevPosition, direction, _hits, distance);
+                if (size > 0)
                 {
-                    Destroy(gameObject);
+                    return;
                 }
-            }
-        }
 
-        private void OnDestroy()
-        {
-            Destroyed?.Invoke(this);
+                await UniTask.Yield();
+            }
         }
     }
 }

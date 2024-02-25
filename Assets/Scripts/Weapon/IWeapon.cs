@@ -1,4 +1,4 @@
-namespace Scripts.Weapon
+namespace Scripts
 {
     public interface IWeapon
     {

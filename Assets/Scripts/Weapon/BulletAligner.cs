@@ -1,9 +1,8 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
-namespace Scripts.Weapon
+namespace Scripts
 {
     public class BulletAligner : ITickable
     {
@@ -26,15 +25,13 @@ namespace Scripts.Weapon
             _enabled = false;
         }
 
-        public void AddBulletToControl(Bullet bullet)
+        public void AddBullet(Bullet bullet)
         {
             _bulletsToControl.Add(bullet);
-            bullet.Destroyed += BulletOnDestroyed;
         }
 
-        private void BulletOnDestroyed(Bullet bullet)
+        public void RemoveBullet(Bullet bullet)
         {
-            bullet.Destroyed -= BulletOnDestroyed;
             _bulletsToControl.Remove(bullet);
         }
 
@@ -44,9 +41,11 @@ namespace Scripts.Weapon
             {
                 return;
             }
+            
+            var playerPosition = _player.transform.position;
+            
             _bulletsToControl.ForEach(bullet =>
             {
-                var playerPosition = _player.transform.position;
                 var bulletTransform = bullet.transform;
                 var bulletPosition = bulletTransform.position;
                 bulletTransform.position = new Vector3(playerPosition.x, bulletPosition.y, bulletPosition.z);

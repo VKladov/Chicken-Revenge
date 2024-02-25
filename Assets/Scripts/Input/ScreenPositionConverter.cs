@@ -1,8 +1,7 @@
-using System;
 using Scripts.Utils;
 using UnityEngine;
 
-namespace Scripts.Input
+namespace Scripts
 {
     public class ScreenPositionConverter
     {

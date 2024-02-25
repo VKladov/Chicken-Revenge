@@ -1,27 +1,15 @@
-using Scripts.Input;
-using Scripts.Weapon;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Zenject;
 
-namespace Scripts.DI
+namespace Scripts
 {
-    public class CompositeRoot : MonoInstaller
+    public class CompositionRoot : MonoInstaller
     {
         [SerializeField] private Rect _playerArea;
         [SerializeField] private Player _player;
         [SerializeField] private Camera _mainCamera;
-        
-        [FormerlySerializedAs("_baseGunView")]
-        [Header("Base Gun Settings")]
-        [SerializeField] private GunView _gunView;
-        [SerializeField] private Bullet _baseGunBullet;
-        [SerializeField] private float _baseGunShotDelay;
-        
-        [Header("Auto Gun Settings")]
-        [SerializeField] private GunView _autoGunView;
-        [SerializeField] private Bullet _autoGunBullet;
-        [SerializeField] private float _autoGunShotDelay;
+        [SerializeField] private GunConfig _baseGunConfig;
+        [SerializeField] private GunConfig _autoGunConfig;
 
         public override void InstallBindings()
         {
@@ -38,27 +26,19 @@ namespace Scripts.DI
             Container.Bind<PlayerShooter>().AsSingle().NonLazy();
             Container.Bind<AlingMode>().AsSingle().NonLazy();
             Container.Bind<WeaponSwitch>().AsSingle().NonLazy();
-
-            Container.Bind<Gun>().WithId("Rifle").FromSubContainerResolve().ByMethod(InstallBaseGun).AsCached();
-            Container.Bind<Gun>().WithId("Auto").FromSubContainerResolve().ByMethod(InstallAutoGun).AsCached();
+            Container.Bind<IWeapon[]>().FromMethod(CreateGuns).AsCached();
         }
 
-        private void InstallBaseGun(DiContainer subContainer)
+        private IWeapon[] CreateGuns(InjectContext context)
         {
-            subContainer.Bind<Gun>().AsSingle();
-            subContainer.Bind<GunView>().FromInstance(_gunView);
-            subContainer.Bind<Bullet>().FromInstance(_baseGunBullet);
-            subContainer.BindInstance(_baseGunShotDelay);
+            var bulletSpawner = context.Container.Resolve<BulletSpawner>();
+            return new IWeapon[]
+            {
+                new Gun(bulletSpawner, _baseGunConfig.View, _baseGunConfig.BulletPrefab, _baseGunConfig.ShotDelay),
+                new Gun(bulletSpawner, _autoGunConfig.View, _autoGunConfig.BulletPrefab, _autoGunConfig.ShotDelay),
+            };
         }
-
-        private void InstallAutoGun(DiContainer subContainer)
-        {
-            subContainer.Bind<Gun>().AsSingle();
-            subContainer.Bind<GunView>().FromInstance(_autoGunView);
-            subContainer.Bind<Bullet>().FromInstance(_autoGunBullet);
-            subContainer.BindInstance(_autoGunShotDelay);
-        }
-
+        
         private void OnDrawGizmos()
         {
             Gizmos.DrawLine(new Vector3(_playerArea.min.x, 0, _playerArea.min.y), new Vector3(_playerArea.max.x, 0, _playerArea.min.y));

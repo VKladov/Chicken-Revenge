@@ -2,7 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace Scripts.Weapon
+namespace Scripts
 {
     public class Gun : IWeapon
     {
@@ -12,20 +12,36 @@ namespace Scripts.Weapon
         private readonly float _shotDelay;
         
         private bool _triggerPressed;
-        private bool _destroyed;
+        private bool _inCooldown;
 
-        public Gun(GunView view, Bullet bullet, BulletSpawner bulletSpawner, float shotDelay)
+        public Gun(BulletSpawner bulletSpawner, GunView view, Bullet bullet, float shotDelay)
         {
             _view = view;
             _bullet = bullet;
             _bulletSpawner = bulletSpawner;
             _shotDelay = shotDelay;
-            Loop().Forget();
         }
 
         public void PressTrigger()
         {
             _triggerPressed = true;
+            if (_inCooldown)
+            {
+                return;
+            }
+            
+            StartFireLoop().Forget();
+        }
+
+        private async UniTask StartFireLoop()
+        {
+            while (_triggerPressed)
+            {
+                Shoot();
+                _inCooldown = true;
+                await UniTask.Delay(TimeSpan.FromSeconds(_shotDelay));
+                _inCooldown = false;
+            }
         }
 
         public void ReleaseTrigger()
@@ -43,24 +59,11 @@ namespace Scripts.Weapon
             _view.gameObject.SetActive(false);
         }
 
-        private async UniTaskVoid Loop()
-        {
-            while (!_destroyed)
-            {
-                await UniTask.WaitUntil(() => _triggerPressed);
-                while (_triggerPressed)
-                { 
-                    Shoot();
-                    await UniTask.Delay(TimeSpan.FromSeconds(_shotDelay));
-                }
-            }
-        }
-
         private void Shoot()
         {
-            var bullet = _bulletSpawner.Spawn(_bullet);
+            var position = _view.GetNextShootPoint();
             var rotation = Quaternion.LookRotation(_view.transform.forward);
-            bullet.transform.SetPositionAndRotation(_view.GetNextShootPoint(), rotation);
+           _bulletSpawner.Spawn(_bullet, position, rotation);
         }
     }
 }

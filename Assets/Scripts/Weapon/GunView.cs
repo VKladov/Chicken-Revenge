@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Scripts.Weapon
+namespace Scripts
 {
     public class GunView : MonoBehaviour
     {

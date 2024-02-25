@@ -1,4 +1,3 @@
-using Scripts.Input;
 using UnityEngine;
 
 namespace Scripts

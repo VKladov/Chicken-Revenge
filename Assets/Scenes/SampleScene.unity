@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.30692244, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -244,12 +244,14 @@ MonoBehaviour:
     height: 10
   _player: {fileID: 2131063277}
   _mainCamera: {fileID: 963194227}
-  _gunView: {fileID: 603947557}
-  _baseGunBullet: {fileID: 5352048875636318529, guid: 492d61d61624140f0805bd45f3863fc8, type: 3}
-  _baseGunShotDelay: 0.4
-  _autoGunView: {fileID: 1873813893}
-  _autoGunBullet: {fileID: 5352048875636318529, guid: 492d61d61624140f0805bd45f3863fc8, type: 3}
-  _autoGunShotDelay: 0.2
+  _baseGunConfig:
+    View: {fileID: 603947557}
+    BulletPrefab: {fileID: 5352048875636318529, guid: 492d61d61624140f0805bd45f3863fc8, type: 3}
+    ShotDelay: 1
+  _autoGunConfig:
+    View: {fileID: 1873813893}
+    BulletPrefab: {fileID: 5352048875636318529, guid: 492d61d61624140f0805bd45f3863fc8, type: 3}
+    ShotDelay: 0.2
 --- !u!4 &545531151
 Transform:
   m_ObjectHideFlags: 0
@@ -803,26 +805,13 @@ GameObject:
   - component: {fileID: 1602081238}
   - component: {fileID: 1602081237}
   - component: {fileID: 1602081236}
-  - component: {fileID: 1602081235}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: BulletsDestroyWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1602081235
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1602081234}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f0a20bfefb44292a19747ea94695fe6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!54 &1602081236
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1265,7 +1254,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1873813892
 Transform:
   m_ObjectHideFlags: 0

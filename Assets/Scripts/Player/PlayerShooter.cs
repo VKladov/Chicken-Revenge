@@ -1,6 +1,3 @@
-using Scripts.Input;
-using Scripts.Weapon;
-
 namespace Scripts
 {
     public class PlayerShooter

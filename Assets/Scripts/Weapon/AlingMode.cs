@@ -1,6 +1,4 @@
-using Scripts.Input;
-
-namespace Scripts.Weapon
+namespace Scripts
 {
     public class AlingMode
     {

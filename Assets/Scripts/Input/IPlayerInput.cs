@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Scripts.Input
+namespace Scripts
 {
     public interface IPlayerInput
     {
