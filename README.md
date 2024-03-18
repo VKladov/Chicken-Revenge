@@ -1,2 +1,2 @@
 # Chicken-Revenge
- Practive of SOLID principles
+ Practice of SOLID principles
