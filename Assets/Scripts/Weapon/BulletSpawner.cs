@@ -19,10 +19,10 @@ namespace Scripts
         {
             var bullet = _pool.Get(prefab);
             bullet.transform.SetPositionAndRotation(position, rotation);
-            BulletLife(bullet, bullet.GetCancellationTokenOnDestroy()).Forget();
+            ControlBullet(bullet, bullet.GetCancellationTokenOnDestroy()).Forget();
         }
 
-        private async UniTaskVoid BulletLife(Bullet bullet, CancellationToken cancellationToken)
+        private async UniTaskVoid ControlBullet(Bullet bullet, CancellationToken cancellationToken)
         {
             _bulletAligner.AddBullet(bullet);
             await bullet.Fly(cancellationToken);

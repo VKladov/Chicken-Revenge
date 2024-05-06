@@ -6,7 +6,7 @@ namespace Scripts
 {
     public class BulletAligner : ITickable
     {
-        private readonly List<Bullet> _bulletsToControl = new();
+        private readonly List<Bullet> _bulletsToControl = new(32);
         private readonly Player _player;
         private bool _enabled;
 

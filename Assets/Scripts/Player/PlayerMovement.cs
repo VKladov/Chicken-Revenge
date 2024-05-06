@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using Zenject;
 
 namespace Scripts
 {
@@ -7,19 +9,19 @@ namespace Scripts
         private readonly Player _player;
         private readonly ScreenPositionConverter _positionConverter;
         private readonly PlayerAreaLimiter _areaLimiter; 
+        private readonly IPlayerInput _playerInput; 
         
         public PlayerMovement(IPlayerInput playerInput, Player player, ScreenPositionConverter positionConverter, PlayerAreaLimiter playerAreaLimiter)
         {
             _player = player;
             _positionConverter = positionConverter;
             _areaLimiter = playerAreaLimiter;
-            
-            playerInput.ScreenPositionChanged += PlayerInputOnScreenPositionChanged;
+            _playerInput = playerInput;
         }
 
-        private void PlayerInputOnScreenPositionChanged(Vector2 screenPosition)
+        public void Update()
         {
-            var groundPosition = _positionConverter.Convert(screenPosition);
+            var groundPosition = _positionConverter.Convert(_playerInput.ScreenPosition);
             var limitedPosition = _areaLimiter.ApplyLimits(groundPosition);
             _player.transform.position = limitedPosition;
         }

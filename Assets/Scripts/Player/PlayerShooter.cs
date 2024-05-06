@@ -1,26 +1,26 @@
+using System;
+using Zenject;
+
 namespace Scripts
 {
-    public class PlayerShooter
+    public class PlayerShooter : IDisposable
     {
-        private readonly Player _player;
-        private readonly BulletAligner _bulletAligner;
-
+        private readonly IPlayerInput _input;
         private IWeapon _weapon;
 
-        public PlayerShooter(IPlayerInput playerInput, Player player)
+        public PlayerShooter(IPlayerInput input)
         {
-            _player = player;
-            
-            playerInput.ShootPressed += PlayerInputOnShootPressed;
-            playerInput.ShootReleased += PlayerInputOnShootReleased;
+            _input = input;
+            _input.ShootPressed += InputOnShootPressed;
+            _input.ShootReleased += InputOnShootReleased;
         }
 
-        private void PlayerInputOnShootPressed()
+        private void InputOnShootPressed()
         {
             _weapon.PressTrigger();
         }
 
-        private void PlayerInputOnShootReleased()
+        private void InputOnShootReleased()
         {
             _weapon.ReleaseTrigger();
         }
@@ -28,6 +28,12 @@ namespace Scripts
         public void TakeWeapon(IWeapon weapon)
         {
             _weapon = weapon;
+        }
+
+        public void Dispose()
+        {
+            _input.ShootPressed -= InputOnShootPressed;
+            _input.ShootReleased -= InputOnShootReleased;
         }
     }
 }

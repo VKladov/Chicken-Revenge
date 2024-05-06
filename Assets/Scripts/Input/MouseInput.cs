@@ -4,15 +4,15 @@ using Zenject;
 
 namespace Scripts
 {
-    public class MouseInput : ITickable, IPlayerInput
+    public class MouseInput : IPlayerInput
     {
+        public Vector2 ScreenPosition { get; private set; }
         public event Action ShootPressed;
         public event Action ShootReleased;
-        public event Action<Vector2> ScreenPositionChanged;
         public event Action ToggleAlingMode;
         public event Action SwitchWeapon;
-
-        public void Tick()
+        
+        public void Update()
         {
             if (Input.GetMouseButtonDown(0))
             {
@@ -33,8 +33,8 @@ namespace Scripts
             {
                 SwitchWeapon?.Invoke();
             }
-        
-            ScreenPositionChanged?.Invoke(Input.mousePosition);
+
+            ScreenPosition = Input.mousePosition;
         }
     }
 }

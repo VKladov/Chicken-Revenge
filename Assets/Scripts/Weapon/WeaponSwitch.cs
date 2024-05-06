@@ -1,25 +1,31 @@
+using System;
 using System.Linq;
+using Zenject;
 
 namespace Scripts
 {
-    public class WeaponSwitch
+    public class WeaponSwitch : IDisposable
     {
+        public class Factory : PlaceholderFactory<PlayerShooter, WeaponSwitch>
+        {
+            
+        }
+        
         private readonly PlayerShooter _shooter;
         private readonly IWeapon[] _weapons;
+        private readonly IPlayerInput _input;
 
         private int _currentWeaponIndex;
         private bool _triggerPressed;
 
         private IWeapon CurrentWeapon => _weapons[_currentWeaponIndex];
         
-        public WeaponSwitch(
-            IPlayerInput input, 
-            PlayerShooter shooter,
-            IWeapon[] weapons)
+        public WeaponSwitch(IPlayerInput input, PlayerShooter shooter, IWeapon[] weapons)
         {
-            input.SwitchWeapon += SwitchWeapon;
-            input.ShootPressed += InputOnShootPressed;
-            input.ShootReleased += InputOnShootReleased;
+            _input = input;
+            _input.SwitchWeapon += SwitchWeapon;
+            _input.ShootPressed += InputOnShootPressed;
+            _input.ShootReleased += InputOnShootReleased;
 
             _shooter = shooter;
             _weapons = weapons;
@@ -53,6 +59,13 @@ namespace Scripts
             {
                 CurrentWeapon.PressTrigger();
             }
+        }
+
+        public void Dispose()
+        {
+            _input.SwitchWeapon -= SwitchWeapon;
+            _input.ShootPressed -= InputOnShootPressed;
+            _input.ShootReleased -= InputOnShootReleased;
         }
     }
 }
