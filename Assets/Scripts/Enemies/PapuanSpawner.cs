@@ -27,8 +27,9 @@ namespace Scripts
 
         private void OnPapuanDied(Papuan papuan)
         {
+            papuan.StopMove();
             papuan.Died -= OnPapuanDied;
-            PapuanDied?.Invoke(papuan.GetCurrentCell());
+            PapuanDied?.Invoke(papuan.CurrentCell);
             _pool.Return(papuan);
         }
     }
