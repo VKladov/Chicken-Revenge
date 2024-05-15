@@ -15,18 +15,25 @@ namespace Scripts
 
         public override void InstallBindings()
         {
-            Container.Bind<PlayerMovement>().AsSingle();
-            Container.Bind<PlayerShooter>().AsSingle();
-            Container.Bind<WeaponSwitch>().AsSingle();
+            // Entry point
+            Container.BindInterfacesAndSelfTo<Game>().AsSingle().NonLazy();
+            
             Container.Bind<Camera>().FromInstance(_mainCamera);
+            
             Container.Bind<Player>().FromInstance(_player);
+            Container.Bind<PlayerMovement>().AsSingle();
+            Container.Bind<ScreenPositionConverter>().AsSingle();
+            
+            Container.Bind<IWeapon[]>().FromMethod(CreateGuns).AsCached();
+            Container.Bind<PlayerShooter>().AsSingle();
+            Container.Bind<BulletSpawner>().AsSingle();
+            Container.Bind<ObjectsPool<Bullet>>().AsSingle();
+            Container.Bind<BulletAligner>().AsSingle();
+            Container.Bind<WeaponSwitch>().AsSingle();
+            Container.Bind<AlingMode>().AsSingle();
+            
             Container.BindInterfacesAndSelfTo<Grid>().FromInstance(_grid);
             Container.BindInterfacesAndSelfTo<MouseInput>().AsSingle();
-            Container.Bind<ScreenPositionConverter>().AsSingle();
-            Container.Bind<ObjectsPool<Bullet>>().AsSingle();
-            Container.Bind<BulletSpawner>().AsSingle();
-            Container.Bind<BulletAligner>().AsSingle();
-            Container.Bind<AlingMode>().AsSingle();
             
             Container.Bind<PapuanSpawner>().AsSingle();
             Container.Bind<ObjectsPool<Papuan>>().AsSingle();
@@ -35,9 +42,6 @@ namespace Scripts
             Container.Bind<ObjectsPool<Obstacle>>().AsSingle();
             Container.Bind<ObstaclesSpawner>().AsSingle();
             Container.Bind<Obstacle>().FromInstance(_obstaclePrefab);
-            
-            Container.Bind<IWeapon[]>().FromMethod(CreateGuns).AsCached();
-            Container.Bind<Game>().AsSingle().NonLazy();
         }
 
         private Gun[] CreateGuns(InjectContext context)

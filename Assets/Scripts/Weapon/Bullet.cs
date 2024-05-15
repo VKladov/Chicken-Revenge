@@ -15,9 +15,11 @@ namespace Scripts
 
         public async UniTask Fly(CancellationToken cancellationToken)
         {
+            var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, this.GetCancellationTokenOnDestroy()).Token;
+            
             _transform = transform;
             var direction = Vector3.up;
-            while (!cancellationToken.IsCancellationRequested)
+            while (!linkedToken.IsCancellationRequested)
             {
                 var prevPosition = transform.position;
             

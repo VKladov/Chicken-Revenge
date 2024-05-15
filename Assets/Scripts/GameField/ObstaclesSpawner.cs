@@ -7,9 +7,10 @@ namespace Scripts
     public class ObstaclesSpawner
     {
         private readonly Dictionary<Vector2Int, Obstacle> _obstacles = new();
-        private readonly ObjectsPool<Obstacle> _obstaclesPool;
+        
         private readonly Obstacle _obstaclesPrefab;
         private readonly Grid _grid;
+        private readonly ObjectsPool<Obstacle> _obstaclesPool;
 
         public ObstaclesSpawner(Obstacle obstaclesPrefab, Grid grid, ObjectsPool<Obstacle> pool)
         {
@@ -29,20 +30,22 @@ namespace Scripts
             var cactus = _obstaclesPool.Get(_obstaclesPrefab);
             cactus.transform.position = _grid.GetCellCenter(cell);
             _obstacles.Add(cell, cactus);
-            cactus.Died += CactusOnDied;
+            cactus.Died += OnCactusDied;
         }
 
-        private void CactusOnDied(Obstacle obstacle)
+        private void OnCactusDied(Obstacle cactus)
         {
+            cactus.Died -= OnCactusDied;
+            
             // TODO: try to avoid loop
             foreach (var (key, value) in _obstacles)
             {
-                if (value != obstacle)
+                if (value != cactus)
                 {
                     continue;
                 }
                 _obstacles.Remove(key);
-                _obstaclesPool.Return(obstacle);
+                _obstaclesPool.Return(cactus);
                 return;
             }
         }

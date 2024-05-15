@@ -2,6 +2,6 @@
 {
     public interface IDamageReceiver
     {
-        public void TakeDamage(int damage);
+        void TakeDamage(int damage);
     }
 }

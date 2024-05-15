@@ -18,6 +18,7 @@ namespace Scripts
         private ObstaclesSpawner _obstacles = null!;
         private Grid _grid = null!;
         private CancellationTokenSource? _moveCancellation = new();
+        private Transform _transform;
 
         public Vector2Int GetCurrentCell() => _currentCell;
 
@@ -26,6 +27,11 @@ namespace Scripts
         {
             _obstacles = obstaclesSpawner;
             _grid = grid;
+        }
+
+        private void Awake()
+        {
+            _transform = transform;
         }
 
         private void OnDisable()
@@ -52,11 +58,11 @@ namespace Scripts
             var verticalDirection = Vector2Int.down;
             while (!cancellationToken.IsCancellationRequested)
             {
-                var remainder = _speed * Time.deltaTime;
+                var moveDelta = _speed * Time.deltaTime;
                 while (CanMoveToCell(_currentCell + sideDirection))
                 {
                     var nextHorizontalCell = _currentCell + sideDirection;
-                    remainder = await MoveTo(nextHorizontalCell, remainder, cancellationToken);
+                    moveDelta = await MoveTo(nextHorizontalCell, moveDelta, cancellationToken);
                     _currentCell = nextHorizontalCell;
                 }
 
@@ -68,18 +74,19 @@ namespace Scripts
                     nextVerticalCell = _currentCell + verticalDirection;
                 }
                 
-                await MoveTo(nextVerticalCell, remainder, cancellationToken);
+                await MoveTo(nextVerticalCell, moveDelta, cancellationToken);
                 _currentCell = nextVerticalCell;
             }
         }
 
-        // Returns remainded distance
+        // Returns distance that left from maxDelta after move to target cell
+        // Ex: maxDelta = 20, distance to target = 15, then returns 5
         private async UniTask<float> MoveTo(Vector2Int cell, float maxDelta, CancellationToken cancellationToken)
         {
             var targetPosition = _grid.GetCellCenter(cell);
             while (!cancellationToken.IsCancellationRequested)
             {
-                transform.position = transform.position.MoveTowardsWithRemainder(targetPosition, maxDelta, out var remainder);
+                _transform.position = transform.position.MoveTowardsWithRemainder(targetPosition, maxDelta, out var remainder);
                 if (remainder > 0f)
                 {
                     return remainder;
@@ -90,7 +97,7 @@ namespace Scripts
 
             if (!cancellationToken.IsCancellationRequested)
             {
-                transform.position = targetPosition;
+                _transform.position = targetPosition;
             }
 
             return 0f;

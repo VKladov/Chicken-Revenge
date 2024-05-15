@@ -5,11 +5,11 @@ namespace Scripts
 {
     public interface IPlayerInput
     {
-        public Vector2 ScreenPosition { get; }
-        public event Action ShootPressed;
-        public event Action ShootReleased;
-        public event Action ToggleAlingMode;
-        public event Action SwitchWeapon;
-        public void Update();
+        Vector2 ScreenPosition { get; }
+        event Action ShootPressed;
+        event Action ShootReleased;
+        event Action ToggleAlingMode;
+        event Action SwitchWeapon;
+        void Update();
     }
 }

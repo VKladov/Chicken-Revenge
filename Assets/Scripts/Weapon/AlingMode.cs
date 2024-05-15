@@ -1,14 +1,18 @@
+using System;
+
 namespace Scripts
 {
-    public class AlingMode
+    public class AlingMode : IDisposable
     {
         private readonly BulletAligner _aligner;
+        private readonly IPlayerInput _input;
         private bool _enabled;
         
         public AlingMode(BulletAligner aligner, IPlayerInput input)
         {
             _aligner = aligner;
-            input.ToggleAlingMode += InputOnToggleAlingMode;
+            _input = input;
+            _input.ToggleAlingMode += InputOnToggleAlingMode;
         }
 
         private void InputOnToggleAlingMode()
@@ -22,6 +26,11 @@ namespace Scripts
             {
                 _aligner.Disable();
             }
+        }
+
+        public void Dispose()
+        {
+            _input.ToggleAlingMode -= InputOnToggleAlingMode;
         }
     }
 }

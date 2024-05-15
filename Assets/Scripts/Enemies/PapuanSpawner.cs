@@ -22,11 +22,12 @@ namespace Scripts
         {
             var papuan = _pool.Get(_prefab);
             papuan.StartMove(cell);
-            papuan.Died += PapuanOnDied;
+            papuan.Died += OnPapuanDied;
         }
 
-        private void PapuanOnDied(Papuan papuan)
+        private void OnPapuanDied(Papuan papuan)
         {
+            papuan.Died -= OnPapuanDied;
             PapuanDied?.Invoke(papuan.GetCurrentCell());
             _pool.Return(papuan);
         }

@@ -20,7 +20,7 @@ namespace Scripts
             return GetCellOrigin(cell) + new Vector3(_cellWidth * 0.5f, _cellWidth * 0.5f);
         }
 
-        public Vector3 GetCellOrigin(Vector2Int cell)
+        private Vector3 GetCellOrigin(Vector2Int cell)
         {
             var offset = new Vector3(cell.x * _cellWidth, cell.y * _cellWidth);
             return GetBottomLeftCorner() + offset;
@@ -51,6 +51,14 @@ namespace Scripts
             rect.xMin += _playerAreaOffset;
             rect.width -= _playerAreaOffset;
             return rect;
+        }
+
+        public bool Contains(Vector2Int cell)
+        {
+            return cell.x >= 0 &&
+                   cell.x <= _cells.x &&
+                   cell.y >= 0 &&
+                   cell.y <= _cells.y;
         }
 
         public Vector3 ApplyPlayerLimits(Vector3 position)
@@ -92,14 +100,6 @@ namespace Scripts
             Gizmos.DrawLine(new Vector3(rect.min.x, rect.max.y), new Vector3(rect.max.x, rect.max.y));
             Gizmos.DrawLine(new Vector3(rect.max.x, rect.max.y), new Vector3(rect.max.x, rect.min.y));
             Gizmos.DrawLine(new Vector3(rect.max.x, rect.min.y), new Vector3(rect.min.x, rect.min.y));
-        }
-
-        public bool Contains(Vector2Int cell)
-        {
-            return cell.x >= 0 &&
-                   cell.x <= _cells.x &&
-                   cell.y >= 0 &&
-                   cell.y <= _cells.y;
         }
     }
 }

@@ -1,11 +1,12 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using Zenject;
 using Random = UnityEngine.Random;
 
 namespace Scripts
 {
-    public class Game
+    public class Game : IDisposable, IInitializable
     {
         private readonly ObstaclesSpawner _obstaclesSpawner;
         private readonly PapuanSpawner _papuanSpawner;
@@ -16,17 +17,22 @@ namespace Scripts
             _obstaclesSpawner = obstaclesSpawner;
             _papuanSpawner = papuanSpawner;
             _grid = grid;
-            Start().Forget();
+        }
+        
+        public void Initialize()
+        {
+            _papuanSpawner.PapuanDied += OnPapuanDied;
             
-            _papuanSpawner.PapuanDied += PapuanSpawnerOnPapuanDied;
+            SpawnCactuses();
+            SpawnEnenies().Forget();
         }
 
-        private void PapuanSpawnerOnPapuanDied(Vector2Int cell)
+        private void OnPapuanDied(Vector2Int cell)
         {
             _obstaclesSpawner.SpawnCactus(cell);
         }
 
-        private async UniTaskVoid Start()
+        private void SpawnCactuses()
         {
             for (var row = 0; row < _grid.Rows; row++)
             {
@@ -38,13 +44,21 @@ namespace Scripts
                     }
                 }
             }
+        }
 
+        private async UniTaskVoid SpawnEnenies()
+        {
             var cell = new Vector2Int(Random.Range(1, _grid.Columns - 1), _grid.Rows);
             for (var i = 0; i < 20; i++)
             {
                 await UniTask.Delay(TimeSpan.FromSeconds(0.2f));
                 _papuanSpawner.Spawn(cell);
             }
+        }
+
+        public void Dispose()
+        {
+            _papuanSpawner.PapuanDied -= OnPapuanDied;
         }
     }
 }

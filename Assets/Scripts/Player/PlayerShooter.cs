@@ -11,16 +11,16 @@ namespace Scripts
         public PlayerShooter(IPlayerInput input)
         {
             _input = input;
-            _input.ShootPressed += InputOnShootPressed;
-            _input.ShootReleased += InputOnShootReleased;
+            _input.ShootPressed += OnShootPressed;
+            _input.ShootReleased += OnShootReleased;
         }
 
-        private void InputOnShootPressed()
+        private void OnShootPressed()
         {
             _weapon.PressTrigger();
         }
 
-        private void InputOnShootReleased()
+        private void OnShootReleased()
         {
             _weapon.ReleaseTrigger();
         }
@@ -32,8 +32,8 @@ namespace Scripts
 
         public void Dispose()
         {
-            _input.ShootPressed -= InputOnShootPressed;
-            _input.ShootReleased -= InputOnShootReleased;
+            _input.ShootPressed -= OnShootPressed;
+            _input.ShootReleased -= OnShootReleased;
         }
     }
 }

@@ -1,13 +1,15 @@
+using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Scripts
 {
-    public class BulletSpawner
+    public class BulletSpawner : IDisposable
     {
         private readonly BulletAligner _bulletAligner;
         private readonly ObjectsPool<Bullet> _pool;
+        private readonly CancellationTokenSource _bulletFlyCancellation = new();
 
         public BulletSpawner(BulletAligner bulletAligner, ObjectsPool<Bullet> bulletsPool)
         {
@@ -19,7 +21,7 @@ namespace Scripts
         {
             var bullet = _pool.Get(prefab);
             bullet.transform.SetPositionAndRotation(position, rotation);
-            ControlBullet(bullet, bullet.GetCancellationTokenOnDestroy()).Forget();
+            ControlBullet(bullet, _bulletFlyCancellation.Token).Forget();
         }
 
         private async UniTaskVoid ControlBullet(Bullet bullet, CancellationToken cancellationToken)
@@ -33,6 +35,12 @@ namespace Scripts
             }
             
             _pool.Return(bullet);
+        }
+
+        public void Dispose()
+        {
+            _bulletFlyCancellation.Cancel();
+            _bulletFlyCancellation.Dispose();
         }
     }
 }
