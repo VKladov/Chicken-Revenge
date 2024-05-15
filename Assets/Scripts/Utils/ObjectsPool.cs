@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 using Object = UnityEngine.Object;
 
 namespace Scripts
@@ -9,7 +10,13 @@ namespace Scripts
     {
         private readonly Dictionary<int, Queue<T>> _pool = new();
         private readonly Dictionary<int, int> _instaceToPrefabId = new();
-        
+        private readonly DiContainer _diContainer;
+
+        public ObjectsPool(DiContainer diContainer)
+        {
+            _diContainer = diContainer;
+        }
+
         public T Get(T prefab)
         {
             var prefabId = prefab.GetInstanceID();
@@ -20,7 +27,7 @@ namespace Scripts
                 return instanceFromPool;
             }
 
-            var instance = Object.Instantiate(prefab);
+            var instance = _diContainer.InstantiatePrefab(prefab).GetComponent<T>();
             _instaceToPrefabId.Add(instance.GetInstanceID(), prefabId);
             return instance;
         }

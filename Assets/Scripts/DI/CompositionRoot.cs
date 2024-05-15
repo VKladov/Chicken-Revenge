@@ -6,10 +6,12 @@ namespace Scripts
 {
     public class CompositionRoot : MonoInstaller
     {
-        [SerializeField] private Rect _playerArea;
         [SerializeField] private Player _player;
         [SerializeField] private Camera _mainCamera;
         [SerializeField] private GunConfig[] _gunsConfigs;
+        [SerializeField] private Grid _grid;
+        [SerializeField] private Obstacle _obstaclePrefab;
+        [SerializeField] private Papuan _papuanPrefab;
 
         public override void InstallBindings()
         {
@@ -18,14 +20,24 @@ namespace Scripts
             Container.Bind<WeaponSwitch>().AsSingle();
             Container.Bind<Camera>().FromInstance(_mainCamera);
             Container.Bind<Player>().FromInstance(_player);
+            Container.BindInterfacesAndSelfTo<Grid>().FromInstance(_grid);
             Container.BindInterfacesAndSelfTo<MouseInput>().AsSingle();
             Container.Bind<ScreenPositionConverter>().AsSingle();
-            Container.Bind<Rect>().FromInstance(_playerArea);
-            Container.Bind<PlayerAreaLimiter>().AsSingle();
+            Container.Bind<ObjectsPool<Bullet>>().AsSingle();
             Container.Bind<BulletSpawner>().AsSingle();
             Container.Bind<BulletAligner>().AsSingle();
             Container.Bind<AlingMode>().AsSingle();
+            
+            Container.Bind<PapuanSpawner>().AsSingle();
+            Container.Bind<ObjectsPool<Papuan>>().AsSingle();
+            Container.Bind<Papuan>().FromInstance(_papuanPrefab);
+            
+            Container.Bind<ObjectsPool<Obstacle>>().AsSingle();
+            Container.Bind<ObstaclesSpawner>().AsSingle();
+            Container.Bind<Obstacle>().FromInstance(_obstaclePrefab);
+            
             Container.Bind<IWeapon[]>().FromMethod(CreateGuns).AsCached();
+            Container.Bind<Game>().AsSingle().NonLazy();
         }
 
         private Gun[] CreateGuns(InjectContext context)

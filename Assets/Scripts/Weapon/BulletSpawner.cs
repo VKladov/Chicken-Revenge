@@ -9,10 +9,10 @@ namespace Scripts
         private readonly BulletAligner _bulletAligner;
         private readonly ObjectsPool<Bullet> _pool;
 
-        public BulletSpawner(BulletAligner bulletAligner)
+        public BulletSpawner(BulletAligner bulletAligner, ObjectsPool<Bullet> bulletsPool)
         {
             _bulletAligner = bulletAligner;
-            _pool = new ObjectsPool<Bullet>();
+            _pool = bulletsPool;
         }
         
         public void Spawn(Bullet prefab, Vector3 position, Quaternion rotation)
